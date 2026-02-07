@@ -11,7 +11,7 @@ public class PlayerInput : MonoBehaviour
     [SerializeField] private float maxSpeed = 10f;
     [SerializeField] private float gravity = -30f;
     private Vector3 velocity;
-    [SerializeField] private float rotationSpped = 4f;
+    [SerializeField] private float rotationSpeed = 4f;
     [SerializeField] private float mouseSensY = 5f;
     private float camXRotation;
     [SerializeField, Self] private CharacterController controller;
@@ -42,11 +42,17 @@ public class PlayerInput : MonoBehaviour
         controller.Move(movement);
 
         // Player Look
-        transform.Rotate(Vector3.up * readLook.x * rotationSpped * Time.deltaTime);
+        transform.Rotate(Vector3.up * readLook.x * rotationSpeed * Time.deltaTime);
 
         // Rotate the camera
         camXRotation += mouseSensY * readLook.y * Time.deltaTime * -1;
         camXRotation = Mathf.Clamp(camXRotation, -90f, 90f);
         cam.gameObject.transform.localRotation = Quaternion.Euler(camXRotation, 0, 0);
+    }
+
+    public void ChangeMouseSensitivity(float value)
+    {
+        mouseSensY = value * 10;
+        rotationSpeed = value * 10;
     }
 }
