@@ -8,6 +8,7 @@ public class PlayerInput : MonoBehaviour
 {
     private InputAction move;
     private InputAction look;
+    private InputAction jump;
     [SerializeField] private float maxSpeed = 10f;
     [SerializeField] private float gravity = -30f;
     private Vector3 velocity;
@@ -16,6 +17,7 @@ public class PlayerInput : MonoBehaviour
     private float camXRotation;
     [SerializeField, Self] private CharacterController controller;
     [SerializeField, Child] private Camera cam;
+    [SerializeField, Scene] private AudioController audioController;
 
     private void OnValidate()
     {
@@ -26,8 +28,20 @@ public class PlayerInput : MonoBehaviour
     {
         move = InputSystem.actions.FindAction("Player/Move");
         look = InputSystem.actions.FindAction("Player/Look");
+        jump = InputSystem.actions.FindAction("Player/Jump");
+        jump.started += Jump;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+    }
+
+    private void OnDisable()
+    {
+        jump.started -= Jump;
+    }
+
+    private void Jump(InputAction.CallbackContext context)
+    {
+        audioController.PlayJumpSFX();
     }
 
     void Update()

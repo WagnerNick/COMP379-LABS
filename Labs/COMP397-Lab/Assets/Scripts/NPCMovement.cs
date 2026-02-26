@@ -13,10 +13,8 @@ public class NPCMovement : MonoBehaviour
     private Vector3 destination;
     private int index;
 
-    private void OnValidate()
-    {
-        this.ValidateRefs();
-    }
+    private void OnValidate() => this.ValidateRefs();
+
 
     void Start()
     {
@@ -35,5 +33,23 @@ public class NPCMovement : MonoBehaviour
             agent.destination = destination;
         }
 
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            destination = other.transform.position;
+            agent.destination = destination;
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            destination = waypoints[index].transform.position;
+            agent.destination = destination;
+        }
     }
 }
