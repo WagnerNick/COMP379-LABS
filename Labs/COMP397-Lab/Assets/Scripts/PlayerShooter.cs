@@ -15,12 +15,12 @@ public class PlayerShooter : MonoBehaviour
 
     private void OnEnable()
     {
-        fire.started += Shoot;
+        fire.started += ShootPooledBullet;
     }
 
     private void OnDisable()
     {
-        fire.started -= Shoot;
+        fire.started -= ShootPooledBullet;
     }
 
     private void Shoot(InputAction.CallbackContext context)
@@ -28,5 +28,13 @@ public class PlayerShooter : MonoBehaviour
         GameObject projectile = GameObject.Instantiate(bullet, projectileSpawn.position, projectileSpawn.rotation);
         projectile.GetComponent<Rigidbody>().AddForce(projectileSpawn.forward * projectileForce, ForceMode.Impulse);
         Destroy(projectile, 1.5f);
+    }
+
+    private void ShootPooledBullet(InputAction.CallbackContext context)
+    {
+        Bullet bullet = BulletObjectPool.Instance.Get();
+        bullet.transform.SetPositionAndRotation(projectileSpawn.position, projectileSpawn.rotation);
+        bullet.gameObject.SetActive(true);
+        bullet.GetComponent<Rigidbody>().AddForce(projectileSpawn.forward * projectileForce, ForceMode.Impulse);
     }
 }

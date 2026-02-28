@@ -10,6 +10,8 @@ public class NPCMovement : MonoBehaviour
 {
     [SerializeField, Self] private NavMeshAgent agent;
     [SerializeField] private List<GameObject> waypoints = new List<GameObject>();
+    [SerializeField] private NPCState currentState;
+    [SerializeField] private Transform player;
     private Vector3 destination;
     private int index;
 
@@ -18,6 +20,7 @@ public class NPCMovement : MonoBehaviour
 
     void Start()
     {
+        currentState = NPCState.Patrol;
         waypoints = GameObject.FindGameObjectsWithTag("Waypoint").ToList();
         if (waypoints.Count < 0) return;
         agent.destination = destination = waypoints[index].transform.position;
@@ -25,22 +28,31 @@ public class NPCMovement : MonoBehaviour
 
     void Update()
     {
-        if (waypoints.Count < 0) return;
-        if (Vector3.Distance(transform.position, destination) < 3f)
+        switch (currentState)
         {
-            index = (index + 1) % waypoints.Count;
-            destination = waypoints[index].transform.position;
-            agent.destination = destination;
+            case NPCState.Patrol:
+                if (waypoints.Count < 0) return;
+                if (Vector3.Distance(transform.position, destination) < 3f)
+                {
+                    index = (index + 1) % waypoints.Count;
+                    destination = waypoints[index].transform.position;
+                    agent.destination = destination;
+                }
+                break;
+            case NPCState.Chase:
+                agent.destination = player.position;
+                break;
+            default:
+                break;
         }
-
     }
 
-    private void OnTriggerStay(Collider other)
+    private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            destination = other.transform.position;
-            agent.destination = destination;
+            currentState = NPCState.Chase;
+            player = other.transform;
         }
     }
 
@@ -48,8 +60,14 @@ public class NPCMovement : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            destination = waypoints[index].transform.position;
+            currentState = NPCState.Patrol;
             agent.destination = destination;
         }
     }
+}
+
+[System.Serializable]
+public enum NPCState
+{
+    Patrol, Chase
 }
