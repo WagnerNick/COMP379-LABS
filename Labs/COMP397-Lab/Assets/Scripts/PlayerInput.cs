@@ -14,6 +14,7 @@ public class PlayerInput : MonoBehaviour
     private Vector3 velocity;
     [SerializeField] private float rotationSpeed = 4f;
     [SerializeField] private float mouseSensY = 5f;
+    [SerializeField] private float mobileScale = 10f;
     private float camXRotation;
     [SerializeField, Self] private CharacterController controller;
     [SerializeField, Child] private Camera cam;
@@ -29,8 +30,10 @@ public class PlayerInput : MonoBehaviour
         look = InputSystem.actions.FindAction("Player/Look");
         jump = InputSystem.actions.FindAction("Player/Jump");
         jump.started += Jump;
+#if !UNITY_ANDROID
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+#endif
     }
 
     private void OnDisable()
@@ -55,10 +58,15 @@ public class PlayerInput : MonoBehaviour
         controller.Move(movement);
 
         // Player Look
-        transform.Rotate(Vector3.up * readLook.x * rotationSpeed * Time.deltaTime);
 
         // Rotate the camera
+#if UNITY_ANDROID
+        transform.Rotate(Vector3.up * readLook.x * rotationSpeed * Time.deltaTime * mobileScale);
+        camXRotation += mouseSensY * readLook.y * Time.deltaTime * -1 * mobileScale;
+#else
+        transform.Rotate(Vector3.up * readLook.x * rotationSpeed * Time.deltaTime);
         camXRotation += mouseSensY * readLook.y * Time.deltaTime * -1;
+#endif
         camXRotation = Mathf.Clamp(camXRotation, -90f, 90f);
         cam.gameObject.transform.localRotation = Quaternion.Euler(camXRotation, 0, 0);
     }
