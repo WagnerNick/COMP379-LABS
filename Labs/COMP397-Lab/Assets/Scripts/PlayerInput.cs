@@ -44,6 +44,7 @@ public class PlayerInput : MonoBehaviour
     private void Jump(InputAction.CallbackContext context)
     {
         AudioController.Instance.PlayJumpSFX();
+        EventChannelManager.Instance.voidEvent.RaiseEvent();
     }
 
     void Update()
